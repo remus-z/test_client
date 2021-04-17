@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "winsock.h"
+#include <string>
 
 #pragma comment(lib, "ws2_32.lib")
 
@@ -43,10 +44,28 @@ int main()
 		return 1;
 	}
 	else {//conn_res = 0,connect success 
-		printf("connect to server:%s", inet_ntoa(addr.sin_addr));
+		printf("connect to server:%s\n", inet_ntoa(addr.sin_addr));
 	}
 
-	closesocket(sock);
+	int transmit_length = 0;
+	char transmit_buff[1024];
+	while (1) {
+		cin >> transmit_buff;
+		transmit_length = send(sock, transmit_buff, 6,0);
+		if (transmit_length < 0) {
+			printf("client send failed\n");
+			break;
+		}
+		transmit_length = recv(sock, transmit_buff, 1024, 0);
+		if (transmit_length < 0) {
+			printf("client receive failed\n");
+			break;
+		}
+		transmit_buff[transmit_length] = '\0';//make a valid string;
+		printf("receive data from serve:%s\n", transmit_buff);
+
+	}
+	closesocket(sock);//test close socket gracely
 
 	return 0;
 
